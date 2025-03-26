@@ -1,0 +1,56 @@
+services:
+  wordpress:
+    container_name: wordpress
+    build:
+      context: .
+      dockerfile: ./worldpress/Dockerfile
+    env_file: .env
+    volumes:
+      - wordpress:/var/www/wordpress
+    depends_on:
+      - mariadb
+    networks:
+      - wordpress_net
+    expose:
+      - "9000"
+  nginx:
+    container_name: nginx
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    ports:
+      - "443:443"
+    volumes:
+      - wordpress:/var/www/wordpress
+    depends_on:
+      - wordpress
+    networks:
+      - wordpress_net
+  mariadb:
+    container_name: mariadb
+    build:
+      context: .
+      dockerfile: ./mariadb/Dockerfile
+    env_file: .env
+    volumes:
+      - mariadb:/var/lib/mysql
+    networks:
+      - wordpress_net
+volumes:
+  wordpress:
+    driver: local
+    driver_opts:
+      name: wordpress
+      type: none
+      o: bind
+      device: '/home/sabartho/data/wordpress'
+  mariadb:
+    name: mariadb
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: '/home/sabartho/data/mariadb'
+networks:
+  wordpress_net:
+    driver: bridge
