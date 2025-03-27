@@ -4,9 +4,10 @@ services:
     build:
       context: .
       dockerfile: ./worldpress/Dockerfile
-    env_file: .env
+    env_file:
+      - .env
     volumes:
-      - wordpress:/var/www/wordpress
+      - wordpress:/var/www/html
     depends_on:
       - mariadb
     networks:
@@ -21,7 +22,7 @@ services:
     ports:
       - "443:443"
     volumes:
-      - wordpress:/var/www/wordpress
+      - wordpress:/var/www/html
     depends_on:
       - wordpress
     networks:
@@ -31,7 +32,8 @@ services:
     build:
       context: .
       dockerfile: ./mariadb/Dockerfile
-    env_file: .env
+    env_file:
+      - .env
     volumes:
       - mariadb:/var/lib/mysql
     networks:
@@ -40,12 +42,10 @@ volumes:
   wordpress:
     driver: local
     driver_opts:
-      name: wordpress
       type: none
       o: bind
       device: '/home/sabartho/data/wordpress'
   mariadb:
-    name: mariadb
     driver: local
     driver_opts:
       type: none

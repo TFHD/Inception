@@ -1,15 +1,19 @@
 #!/bin/bash
 
-service mysql start 
-
-echo "CREATE USER IF NOT EXISTS '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_USER';" | mysql
-echo "GRANT ALL PRIVILEGES ON *.* TO '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD';" | mysql
-echo "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD';" | mysql
-echo "FLUSH PRIVILEGES;" | mysql
-echo "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;" | mysql
+service mariadb start
 
 sleep 2
 
-service mysql stop
+mysql --user=root -e "CREATE DATABASE IF NOT EXISTS $db_name;"
+mysql --user=root -e "CREATE USER IF NOT EXISTS '$db_user'@'%' IDENTIFIED BY '$db_pwd';"
+mysql --user=root -e "GRANT ALL PRIVILEGES ON $db_name.* TO '$db_user'@'%';"
+mysql --user=root -e "FLUSH PRIVILEGES;"
+mysql --user=root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$db_root_pwd' ;"
 
-exec mysqld_safe
+sleep 2
+
+mysqladmin -u root -p"$db_root_pwd" shutdown
+
+sleep 5
+
+/usr/bin/mysqld_safe

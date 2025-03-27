@@ -1,17 +1,11 @@
 FROM debian:bullseye
 
-RUN apt-get update && apt-get upgrade -y && apt-get install -y mariadb-server mariadb-client zsh gettext-base
+RUN apt-get update -y && apt-get upgrade -y && apt-get install -y mariadb-server mariadb-client
 
-EXPOSE 3306
+RUN sed -i 's/127.0.0.1/0.0.0.0/1' /etc/mysql/mariadb.conf.d/50-server.cnf
 
-COPY ./mariadb/conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
+COPY ./mariadb/tools/script.sh /
 
-RUN mkdir /entrypoint-initdb.d/
+RUN chmod +x /script.sh
 
-COPY ./mariadb/init.sql.template /entrypoint-initdb/.
-
-RUN mkdir -p /run/mysqld && chown -R mysql:mysql /run/mysqld
-COPY ./mariadb/docker-entrypoint.sh .
-RUN chmod +x docker-entrypoint.sh
-ENTRYPOINT ["./docker-entrypoint.sh"]
-CMD ["mysqld"]
+CMD ["./script.sh"]

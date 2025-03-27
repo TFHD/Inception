@@ -1,13 +1,9 @@
 FROM debian:bullseye
 
-RUN apt-get update && apt-get upgrade -y && apt-get install -y curl php-fpm php-mysqli zsh
-RUN mkdir -p /run/php && chown www-data:www-data /run/php
+RUN apt-get update -y && apt-get upgrade -y && apt-get install -y php-fpm php-mysql curl
 
-COPY ./worldpress/conf/www.conf /etc/php/7.4/fpm/pool.d/
-WORKDIR /var/www/html/
-COPY ./worldpress/tools/script.sh ./
+COPY ./worldpress/tools/script.sh /
 
-EXPOSE 9000
-ENTRYPOINT ["/var/www/html/script.sh"]
+RUN chmod +x /script.sh
 
-CMD ["php-fpm7.4", "-F"]
+CMD ["./script.sh"]

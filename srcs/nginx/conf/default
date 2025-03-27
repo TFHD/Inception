@@ -19,8 +19,8 @@
 # Default server configuration
 #
 server {
-	listen 443 default_server;
-	listen [::]:443 default_server;
+	listen 443 ssl default_server;
+	listen [::]:443 ssl default_server;
 
 	# SSL configuration
 	#
@@ -40,11 +40,11 @@ server {
 
 	root /var/www/html;
 	ssl_protocols TLSv1.2 TLSv1.3;
-	ssl_certificate /etc/nginx/ssl/inception.crt;
-	ssl_certificate_key /etc/nginx/ssl/inception.key;
-	index index.html index.htm index.nginx-debian.html;
+	ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
+	ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+	index index.php;
 
-	server_name localhost;
+	server_name www.sabartho.42.fr sabartho.42.fr;
 
 	location / {
 		try_files $uri $uri/ =404;
@@ -54,7 +54,7 @@ server {
 	#
 	location ~ \.php$ {
 		include snippets/fastcgi-php.conf;
-		fastcgi_pass 127.0.0.1:9000;
+		fastcgi_pass wordpress:9000;
 	}
 
 	# deny access to .htaccess files, if Apache's document root
