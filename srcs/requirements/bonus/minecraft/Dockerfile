@@ -6,6 +6,7 @@ RUN apt install -y openjdk-11-jdk openjdk-11-jre
 
 WORKDIR /server
 
-RUN wget https://piston-data.mojang.com/v1/objects/b58b2ceb36e01bcd8dbf49c8fb66c55a9f0676cd/server.jar
+RUN wget https://piston-data.mojang.com/v1/objects/fe123682e9cb30031eae351764f653500b7396c9/server.jar
 COPY eula.txt .
+EXPOSE 25565
 ENTRYPOINT ["java", "-Xms1024m", "-Xmx2560m","-jar","server.jar","nogui;"]

@@ -125,8 +125,12 @@ services:
     container_name: minecraft
     networks:
       - inception
+    depends_on:
+      - wordpress
     volumes:
       - minecraft:/server
+    ports:
+      - "25565:25565"
     restart: always
 
 networks:
