@@ -40,6 +40,8 @@ services:
       - wordpress:/var/www/html
     depends_on:
       - wordpress
+      - adminer
+      - static_webpage
     ports:
       - "443:443"
     restart: always
@@ -53,6 +55,7 @@ services:
       - wordpress:/var/www/html
     depends_on:
       - mariadb
+      - redis
     env_file:
       - .env
     expose:

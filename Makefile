@@ -1,7 +1,7 @@
 LOGIN	= sabartho
 
 TPUT	= tput -T xterm-256color
-_RESET	= $(shell $(TPUT) srg0)
+_RESET	= $(shell $(TPUT) sgr0)
 _BOLD	= $(shell $(TPUT) bold)
 _ITALIC	= $(shell $(TPUT) sitm)
 _UNDER	= $(shell $(TPUT) smul)
@@ -34,15 +34,15 @@ up: title
 	@docker compose -f ./srcs/docker-compose.yml up -d
 
 down:
-	@printf "🔧 $(_GREEN)Down containers$(_RESET) 🔧\n\n"
+	@printf "\n🔧 $(_GREEN)Down containers$(_RESET) 🔧\n\n"
 	@docker compose -f ./srcs/docker-compose.yml down
 
 clean: down
-	@printf "🔧 $(_GREEN)Delete /home/$(LOGIN)/data$(_RESET)🔧\n\n"
+	@printf "\n🔧 $(_GREEN)Delete /home/$(LOGIN)/data$(_RESET) 🔧\n\n"
 	@rm -rf /home/$(LOGIN)/data
 
 fclean: clean
-	@printf "🔧 $(_GREEN)Delete containers images$(_RESET) 🔧\n\n"
+	@printf "\n🔧 $(_GREEN)Delete containers images$(_RESET) 🔧\n\n"
 	@docker system prune -af
 
 re: fclean all
