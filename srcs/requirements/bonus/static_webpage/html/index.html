@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Page</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            transition: background-color 1s ease;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            background-color: #4CAF50;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <button id="moveButton">Give me 125/100</button>
+
+    <script>
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        setInterval(() => {
+            document.body.style.backgroundColor = getRandomColor();
+        }, 1000);
+
+        const moveButton = document.getElementById("moveButton");
+
+        moveButton.addEventListener("click", () => {
+            const maxX = window.innerWidth - moveButton.offsetWidth;
+            const maxY = window.innerHeight - moveButton.offsetHeight;
+
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+
+            moveButton.style.position = "absolute";
+            moveButton.style.left = randomX + "px";
+            moveButton.style.top = randomY + "px";
+        });
+    </script>
+</body>
+</html>

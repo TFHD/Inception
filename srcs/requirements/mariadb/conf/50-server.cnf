@@ -1,0 +1,10 @@
+[server]
+init_file = /etc/mysql/init.sql
+
+[mysqld]
+user                    = root
+socket                  = /run/mysqld/mysqld.sock
+port                    = 3306
+datadir                 = /var/lib/mysql
+skip-networking			= 0
+bind-address            = 0.0.0.0

@@ -1,56 +1,136 @@
-services:
+volumes:
+  mariadb:
+    name: mariadb
+    driver: local
+    driver_opts:
+      device: /home/sabartho/data/mariadb
+      o: bind
+      type: none
+
   wordpress:
-    container_name: wordpress
-    build:
-      context: .
-      dockerfile: ./worldpress/Dockerfile
-    env_file:
-      - .env
-    volumes:
-      - wordpress:/var/www/html
-    depends_on:
-      - mariadb
-    networks:
-      - wordpress_net
-    expose:
-      - "9000"
+    name: wordpress
+    driver: local
+    driver_opts:
+      device: /home/sabartho/data/wordpress
+      o: bind
+      type: none
+
+  adminer:
+    name: adminer
+    driver: local
+    driver_opts:
+      device: /home/sabartho/data/adminer
+      o: bind
+      type: none
+  minecraft:
+    name: minecraft
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: /home/sabartho/data/minecraft
+
+services:
   nginx:
     container_name: nginx
-    build:
-      context: .
-      dockerfile: ./nginx/Dockerfile
-    ports:
-      - "443:443"
+    build: ./requirements/nginx
+    networks: 
+      - inception
     volumes:
       - wordpress:/var/www/html
     depends_on:
       - wordpress
-    networks:
-      - wordpress_net
-  mariadb:
-    container_name: mariadb
-    build:
-      context: .
-      dockerfile: ./mariadb/Dockerfile
+    ports:
+      - "443:443"
+    restart: always
+
+  wordpress:
+    container_name: wordpress
+    build: ./requirements/wordpress
+    networks: 
+      - inception
+    volumes:
+      - wordpress:/var/www/html
+    depends_on:
+      - mariadb
     env_file:
       - .env
+    expose:
+      - "9000"
+    restart: always
+
+  mariadb:
+    container_name: mariadb
+    build: ./requirements/mariadb
+    networks: 
+      - inception
     volumes:
       - mariadb:/var/lib/mysql
+    env_file:
+      - .env
+    expose:
+      - "3306"
+    restart: always
+
+  ftp:
+    container_name: ftp
+    build: requirements/bonus/ftp
+    ports:
+      - "21:21"
+      - "21100-21110:21100-21110"
+    volumes:
+      - "wordpress:/var/www/html"
+    depends_on:
+      - wordpress
+    env_file:
+      - .env
     networks:
-      - wordpress_net
-volumes:
-  wordpress:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: '/home/sabartho/data/wordpress'
-  mariadb:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: '/home/sabartho/data/mariadb'
+      - inception
+    restart: always
+  
+  redis:
+    container_name: redis
+    build: requirements/bonus/redis
+    volumes:
+      - "wordpress:/var/www/html"
+    depends_on:
+      - wordpress
+    networks:
+      - inception
+    restart: always
+
+  adminer:
+    container_name: adminer
+    build: ./requirements/bonus/adminer
+    networks:
+      - inception
+    depends_on:
+      - wordpress
+      - mariadb
+    volumes:
+      - adminer:/var/www/html
+    restart: always
+
+  static_webpage:
+    build: ./requirements/bonus/static_webpage
+    container_name: static_webpage
+    networks:
+      - inception
+    ports:
+      - "81:81"
+    restart: always
+
+  server-minecraft:
+    build: requirements/bonus/minecraft/
+    container_name: minecraft
+    networks:
+      - inception
+    volumes:
+      - minecraft:/server
+    restart: always
+
 networks:
-  wordpress_net:
+  inception:
+    name: inception
     driver: bridge
+
