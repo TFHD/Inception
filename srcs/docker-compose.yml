@@ -44,7 +44,7 @@ services:
       - static_webpage
     ports:
       - "443:443"
-    restart: always
+    restart: on-failure
 
   wordpress:
     container_name: wordpress
@@ -60,7 +60,7 @@ services:
       - .env
     expose:
       - "9000"
-    restart: always
+    restart: on-failure
 
   mariadb:
     container_name: mariadb
@@ -73,7 +73,7 @@ services:
       - .env
     expose:
       - "3306"
-    restart: always
+    restart: on-failure
 
   ftp:
     container_name: ftp
@@ -89,18 +89,16 @@ services:
       - .env
     networks:
       - inception
-    restart: always
+    restart: on-failure
   
   redis:
     container_name: redis
     build: requirements/bonus/redis
     volumes:
       - "wordpress:/var/www/html"
-    depends_on:
-      - wordpress
     networks:
       - inception
-    restart: always
+    restart: on-failure
 
   adminer:
     container_name: adminer
@@ -112,7 +110,7 @@ services:
       - mariadb
     volumes:
       - adminer:/var/www/html
-    restart: always
+    restart: on-failure
 
   static_webpage:
     build: ./requirements/bonus/static_webpage
@@ -134,10 +132,9 @@ services:
       - minecraft:/server
     ports:
       - "25565:25565"
-    restart: always
+    restart: on-failure
 
 networks:
   inception:
     name: inception
     driver: bridge
-
