@@ -26,21 +26,24 @@ title:
 ▐▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▌$(_RESET)\n\n\n"
 
 up: title
-	mkdir -p /home/$(LOGIN)/data
-	mkdir -p /home/$(LOGIN)/data/mariadb
-	mkdir -p /home/$(LOGIN)/data/wordpress
-	mkdir -p /home/$(LOGIN)/data/adminer
-	mkdir -p /home/$(LOGIN)/data/minecraft
-	docker compose -f ./srcs/docker-compose.yml up
+	@mkdir -p /home/$(LOGIN)/data
+	@mkdir -p /home/$(LOGIN)/data/mariadb
+	@mkdir -p /home/$(LOGIN)/data/wordpress
+	@mkdir -p /home/$(LOGIN)/data/adminer
+	@mkdir -p /home/$(LOGIN)/data/minecraft
+	@docker compose -f ./srcs/docker-compose.yml up -d
 
 down:
-	docker compose -f ./srcs/docker-compose.yml down
+	@printf "🔧 $(_GREEN)Down containers$(_RESET) 🔧\n\n"
+	@docker compose -f ./srcs/docker-compose.yml down
 
 clean: down
-	rm -rf /home/$(LOGIN)/data
+	@printf "🔧 $(_GREEN)Delete /home/$(LOGIN)/data$(_RESET)🔧\n\n"
+	@rm -rf /home/$(LOGIN)/data
 
 fclean: clean
-	docker system prune -af
+	@printf "🔧 $(_GREEN)Delete containers images$(_RESET) 🔧\n\n"
+	@docker system prune -af
 
 re: fclean all
 
