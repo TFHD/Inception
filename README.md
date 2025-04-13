@@ -148,3 +148,85 @@ On va utiliser FastCGI pour interpreter notre PHP. FastCGI est un protocole de c
 
 C’est là que FastCGI entre en jeu :
 Nginx transmet la requête via FastCGI → PHP-FPM (dans le container wordpress d'ou le wordpress:9000) exécute le code → Nginx récupère la réponse → et l’envoie au client.
+
+---
+
+## 📂​ MariaDB : 
+
+-> Il nous faut stocker tous nos users et d'autres données utiles pour que Wordpress puisse y acceder. MariaDB est un système de gestion de base de données relationnelle (SGBD), open-source, basé sur MySQL. Si vous faites la je vous fait pas un cours vous devez surement savoir qu'est ce qu'une base de donnée ^^.
+
+Regardon ce que dit le Dockerfile :
+
+```
+FROM debian:bullseye
+
+RUN apt update -y && apt upgrade -y && apt install -y mariadb-server mariadb-client gettext-base
+
+#EXPOSE PORT 3306 LIKE SUBJECT ASK AND COPY MARIADB CONFIG
+EXPOSE 3306
+COPY ./conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
+
+
+RUN mkdir ./entrypoint-initdb.d
+COPY ./tools/init.sql.template /entrypoint-initdb.d
+RUN mkdir -p /run/mysqld && chown -R mysql:mysql /run/mysqld
+
+
+#COPY ENTRYPOINT AND ADD EXECUTION PERMISSIONS
+COPY ./tools/entrypoint.sh ./
+RUN chmod +x entrypoint.sh
+
+ENTRYPOINT ["./entrypoint.sh"]
+CMD ["mysqld"]
+```
+
+Bon alors en réalité il n'y pas beaucoup de choses mais quand meme quelques truc en plus par rapport a Nginx.
+
+On installe les packages nécéssaires pour MariaDB et aussi `gettext-base` qui aura toute son importance vous aller voir.
+On expose le port 3306 au sein du network, on se donne des droits, on copie les configs de MariaDB et un fichier d'execution ?
+
+Dans ce Dockerfile, on a une nomenclature un peu bizarre :
+
+```dockerfile
+ENTRYPOINT ["./entrypoint.sh"]
+CMD ["mysqld"]
+```
+
+Pour ceux qui debute en Dockerfile vous ne devez surrement pas trop connaitre le mot "ENTRYPOINT" (au passage je n'ai pas expliqué les autres termes du Dockerfile mais je pense qu'il sont plutot evident si vous les traduisez 🥹).
+
+Un entrypoint est le point d’entrée principal d’un conteneur Docker.
+C’est le programme ou script qui est exécuté automatiquement quand un conteneur démarre.
+
+🧠 En gros :
+ENTRYPOINT = "Qu’est-ce que mon conteneur est censé faire ?"
+
+Par exemple :
+
+- Un conteneur Nginx : son entrypoint est le binaire nginx.
+
+- Un conteneur MariaDB : son entrypoint est le serveur de base de données.
+
+- Un conteneur custom WordPress : souvent, c’est un script shell qui prépare l’environnement (création de config, DB, etc.)
+
+ça se définit comme ça :
+
+```dockerfile
+ENTRYPOINT ["executable", "param1", "param2"]
+```
+
+Certains pourraient confondre l'utilité de CMD et de ENTRYPOINT, voici la petite différence :
+
+![image](https://github.com/user-attachments/assets/24c7893b-71dd-48b8-bd7c-f3f43edd9da4)
+
+donc une fois combiné
+
+```dockerfile
+ENTRYPOINT ["./entrypoint.sh"]
+CMD ["mysqld"]
+```
+
+ça revient à lancer (vous allez comprendre pourquoi apres l'explication du script):
+
+```bash
+./entrypoint.sh mysqld
+```
