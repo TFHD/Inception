@@ -106,3 +106,45 @@ Le sujet demande a ce que les images utilisés soient seulement les versions dit
 Donc je préfere utiliser debian par préférence et car je connais mieux l'OS et pour ce qui est de la version aujourd'hui le 13/04/2025 la version old-stable est "Bullseye" donc notre image va etre debian:bullseye pour tout nos fichiers dockers.
 
 `FROM debian:bullseye`
+
+Oo va devoir aussi creer notre certificat SSL/TLS signé par nous meme
+
+`openssl req -x509 -nodes -out /etc/nginx/ssl/certificate.crt -keyout /etc/nginx/ssl/certificate.key -subj "/C=FR/ST=NA/L=Angouleme/O=42/OU=42/CN=$DOMAIN_NAME/UID=sabartho"`
+
+
+Pour la config de Nginx on va devoir changer quelques valeurs pour que containers reponde aux exigeances du sujet 🫵
+
+```dockerfile
+server {
+    listen      443 ssl;
+    server_name $DOMAIN_NAME www.$DOMAIN_NAME;
+    root    /var/www/html/;
+    index index.php;
+
+    ssl_certificate     /etc/nginx/ssl/certificate.crt;
+    ssl_certificate_key /etc/nginx/ssl/certificate.key;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_session_timeout 10m;
+    keepalive_timeout 70;
+
+    location ~ \.php$ {
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass wordpress:9000;
+        fastcgi_index index.php;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+    }
+[...]
+```
+
+On dit ici que notre serveur va écouter sur le port 443, le nom de notre serveur sera donc $DOMAIN_NAME (valeur dans le .env), que sa racine est /var/www/html et que la page par defaut sera index.php.
+
+On précise aussi les certificats SSL utilisés (ceux qu'on a générés plus tot) et aussi le protocole utilisé : `TLSv1.2 TLSv1.3` (demandé par le sujet)
+
+On doit aussi dire a Nginx d'envoyer nos requetes php `location ~ \.php$` vers wordpress `wordpress:9000` car Nginx ne sait pas exécuter du PHP tout seul, il faut un intermédiaire pour envoyer le fichier .php à un interpréteur PHP, récupérer le résultat, puis le renvoyer au navigateur.
+
+On va utiliser FastCGI pour interpreter notre PHP. FastCGI est un protocole de communication qui permet à un serveur web (comme Nginx) de parler avec un interpréteur d’un langage serveur (comme PHP, Python...). Plus précisément, c’est un pont entre le serveur web et le moteur d’exécution du code dynamique.
+
+C’est là que FastCGI entre en jeu :
+Nginx transmet la requête via FastCGI → PHP-FPM (dans le container wordpress d'ou le wordpress:9000) exécute le code → Nginx récupère la réponse → et l’envoie au client.
