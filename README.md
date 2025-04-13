@@ -79,7 +79,7 @@ Voici un bref résumé de ce que vous pouvez retrouver dans un fichier docker-co
 
 Bon apres savoir ce qu'est Nginx il est temps de l'installer et le configurer ! Attaquons nous au Dockerfile du container (j'ai mis certains commentaire pour vous aider a mieux comprendre ces lignes).
 
-```C
+```dockerfile
 FROM debian:bullseye
 
 RUN apt update -y && apt upgrade -y && apt install -y nginx openssl
