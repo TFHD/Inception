@@ -114,7 +114,7 @@ Oo va devoir aussi creer notre certificat SSL/TLS signé par nous meme
 
 Pour la config de Nginx on va devoir changer quelques valeurs pour que containers reponde aux exigeances du sujet 🫵
 
-```dockerfile
+```nginx
 server {
     listen      443 ssl;
     server_name $DOMAIN_NAME www.$DOMAIN_NAME;
