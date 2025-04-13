@@ -274,7 +274,7 @@ Pour les connaisseurs ce fichier contient des commandes **SQL** :
 
 En réalité pour ceux qui auront compris ce sont des instructions qui vont etre effectuées lors du démmarage de notre container MariaDB, ce fichier va servir donc de fichier d'initialisation (mentionné dans le fichier de config qu'on a modifié) :
 
-```nginx
+```mariadb
 [server]
 init_file = /etc/mysql/init.sql
 
@@ -306,3 +306,89 @@ exec "mysqld"
 ```
 
 Le service mysqld va donc se lancer !
+
+---
+
+## 📂​ Wordpress : 
+
+Si vous etes ici c'est que vous avez survecu a mes explications GG et merci <3.
+
+Bon passons donc a la derniere partie de ce projet, l'installation de **Wordpress** et honnetement je pense que c'est la plus simple des 3 parties.
+
+Pour ceux qui vivent dans une caverne, WordPress est un CMS (Content Management System) — en français, un système de gestion de contenu. Il permet de créer, gérer et publier facilement un site web sans avoir à coder (ou très peu).
+
+Voici le fichier Dockerfile du container Wordpress :
+
+```dockerfile
+FROM debian:bullseye
+
+RUN apt update -y && apt upgrade -y && apt install -y curl php-fpm php-mysqli
+
+#ADD RIGHTS TO /run/php
+RUN mkdir -p /run/php && chown www-data:www-data /run/php
+
+#COPY WORDPRESS CONFIG AND SET THE WORK DIR
+COPY ./conf/www.conf /etc/php/7.4/fpm/pool.d
+WORKDIR /var/www/html
+
+#COPY SETUP SCRIPT AND ADD RIGHTS
+COPY ./tools/script.sh .
+RUN chmod +x script.sh
+
+#SET PORTS 9000 LIKE SUBJECT ASK
+EXPOSE 9000
+
+ENTRYPOINT ["/var/www/html/script.sh"]
+CMD ["php-fpm7.4", "-F"]
+```
+
+Honnetement ayant donné les explications pour MariaDB il n'y donc pas grand choses a expliquer sur ce Dockerfile, on installe les packages dont on a besoin, on copie le fichier de configuration modifié, on expose le port et on execute le script.
+
+```dockerfile
+ENTRYPOINT ["/var/www/html/script.sh"]
+CMD ["php-fpm7.4", "-F"]
+```
+
+donc si vous avez bien compris c'est comme si on executais dans bash : 
+
+```bash
+./var/www/html/script.sh "php-fpm7.4", "-F"
+```
+
+Voici ce qui se trouve dans le script :
+
+```bash
+#!/bin/sh
+
+curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+
+chmod +x wp-cli.phar
+
+./wp-cli.phar core download --allow-root
+./wp-cli.phar config create --dbname=$DB_NAME --dbuser=$DB_USER --dbpass=$DB_PASSWORD --dbhost=mariadb --allow-root
+./wp-cli.phar core install --url=$DOMAIN_NAME --title=inception --admin_user=$WP_USER --admin_password=$WP_PASS --admin_email=$WP_MAIL --allow-root
+./wp-cli.phar user create $WP_USER2 $WP_MAIL2 --role=author --user_pass=$WP_PASS2 --allow-root
+./wp-cli.phar user set-role 2 editor --allow-root
+
+./wp-cli.phar theme install astra --activate --allow-root
+
+[...]
+
+exec "$@"
+```
+
+Alors la il y a plus de choses a dire, mais bon en réalité c'est juste de la configuration rien d'exceptionnel.
+
+Premierement on télécharge la WP-CLI de wordpress, mais c'est exactement ? 
+C’est la version exécutable (en .phar) de WP-CLI, un outil en ligne de commande pour gérer un site WordPress sans interface graphique. Car oui il faut que quand on arrive sur notre site tout soit déja pret donc on configure avant le lancement.
+
+Ensuite voici le détails des commandes : 
+
+- `./wp-cli.phar core download --allow-root` : télécharge tous les fichiers de wordpress
+- `./wp-cli.phar config create --dbname=$DB_NAME --dbuser=$DB_USER --dbpass=$DB_PASSWORD --dbhost=mariadb --allow-root` : setup la DataBase avec wordpress
+- `./wp-cli.phar core install --url=$DOMAIN_NAME --title=inception --admin_user=$WP_USER --admin_password=$WP_PASS --admin_email=$WP_MAIL --allow-root` : on installe et stup wordpress avec le titre, l'url et les infos de l'admin
+- `./wp-cli.phar user create $WP_USER2 $WP_MAIL2 --role=author --user_pass=$WP_PASS2 --allow-root` : on creer un deuxieme user (demandé par le sujet)
+- `./wp-cli.phar user set-role 2 editor --allow-root` : on met a cet user le droit d'éditer les comments (sujet de correction)
+- `./wp-cli.phar theme install astra --activate --allow-root` : j'installe le theme astra parce que le theme de base est moche 😝
+
+et on execute `php-fpm7.4 -F`
