@@ -79,20 +79,25 @@ Voici un bref résumé de ce que vous pouvez retrouver dans un fichier docker-co
 
 Bon apres savoir ce qu'est Nginx il est temps de l'installer et le configurer ! Attaquons nous au Dockerfile du container (j'ai mis certains commentaire pour vous aider a mieux comprendre ces lignes).
 
-``C
-FROM debian:bullseye<br/>
+```C
+FROM debian:bullseye
+
 RUN apt update -y && apt upgrade -y && apt install -y nginx openssl
+
 #SETUP SSL KEY
 RUN mkdir -p /etc/nginx/ssl
 RUN openssl req -x509 -nodes -out /etc/nginx/ssl/certificate.crt -keyout /etc/nginx/ssl/certificate.key -subj "/C=FR/ST=NA/L=Angouleme/O=42/OU=42/CN=$DOMAIN_NAME/UID=sabartho"
+
 #CREATE /var/run/nginx DIRECTORY AND COPY NGINX CONFIG
 RUN mkdir -p /var/run/nginx
 COPY ./conf/nginx.conf /etc/nginx/conf.d
+
 #SET PORT 443 FOR INTERNET LIKE SUBJECT ASK
 EXPOSE 443
+
 #LAUNCH NGINX ("-g" ALLOW FOR EDIT THE MAIN FILE CONFIG ; "daemon off" ALLOW NGINX TO RUN IN THE FOREGROUND)
 CMD ["nginx", "-g", "daemon off;"]
-``
+```
 
 Pour chaque container on va avoir besoin d'une image ou en d'autre terme un moyen un starter-pack, sur quel OS on va tourner ou meme est ce qu'on a besoin d'un OS pourquoi pas prendre directement juste Nginx ?
 Le sujet demande a ce que les images utilisés soient seulement les versions dites "old-stable" de Debian ou de Alpine (Trop dommage on aurait pu télécharger des images préfaites ça aurait été plus simple et moins loooooong 🫠​)
