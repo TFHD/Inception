@@ -100,6 +100,9 @@ CMD ["nginx", "-g", "daemon off;"]
 ```
 
 Pour chaque container on va avoir besoin d'une image ou en d'autre terme un moyen un starter-pack, sur quel OS on va tourner ou meme est ce qu'on a besoin d'un OS pourquoi pas prendre directement juste Nginx ?
+
 Le sujet demande a ce que les images utilisés soient seulement les versions dites "old-stable" de Debian ou de Alpine (Trop dommage on aurait pu télécharger des images préfaites ça aurait été plus simple et moins loooooong 🫠​)
+
 Donc je préfere utiliser debian par préférence et car je connais mieux l'OS et pour ce qui est de la version aujourd'hui le 13/04/2025 la version old-stable est "Bullseye" donc notre image va etre debian:bullseye pour tout nos fichiers dockers.
+
 `FROM debian:bullseye`
