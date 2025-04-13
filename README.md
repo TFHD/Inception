@@ -49,6 +49,7 @@ Ce dernier va etre composé en trois parties :
 Voici un exemple dans le fichier *docker-compose.yml* :
 
 ![image](https://github.com/user-attachments/assets/481d7afc-563a-4287-9e46-369faa2447d3)
+
 Ceci est la déclaration du containers Nginx c'est donc un service comme Mariadb ou Wordpress. Je vais vous expliquer ce que veux dire ces quelques lignes :
 
 - **container_name** : on donne ici le nom de notre image nginx le meme nom que son container (demandé dans le sujet)
@@ -79,7 +80,7 @@ Voici un bref résumé de ce que vous pouvez retrouver dans un fichier docker-co
 Bon apres savoir ce qu'est Nginx il est temps de l'installer et le configurer ! Attaquons nous au Dockerfile du container (j'ai mis certains commentaire pour vous aider a mieux comprendre ces lignes).
 
 ``
-FROM debian:bullseye
+FROM debian:bullseye<br/>
 RUN apt update -y && apt upgrade -y && apt install -y nginx openssl
 #SETUP SSL KEY
 RUN mkdir -p /etc/nginx/ssl
