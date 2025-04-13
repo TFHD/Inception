@@ -23,13 +23,13 @@ Voici un aperçu des services généralement attendus dans ce projet :
 
 ![image](https://github.com/user-attachments/assets/97a318d9-b3e7-4fe5-ac63-d6f7bdd7a573)
 
-inception/
-   │
-   ├── srcs/
-   ├── docker-compose.yml 
-   ├── requirements/
-   │   ├── nginx/ 
-   │   ├── wordpress/
-   │   └── mariadb/
-   └── .env
-   └── README.md
+inception/ </br>
+   │</br>
+   ├── srcs/</br>
+   ├── docker-compose.yml </br>
+   ├── requirements/</br>
+   │   ├── nginx/ </br>
+   │   ├── wordpress/</br>
+   │   └── mariadb/</br>
+   └── .env</br>
+   └── README.md</br>
