@@ -157,7 +157,7 @@ Nginx transmet la requête via FastCGI → PHP-FPM (dans le container wordpress 
 
 Regardon ce que dit le Dockerfile :
 
-```
+```dockerfile
 FROM debian:bullseye
 
 RUN apt update -y && apt upgrade -y && apt install -y mariadb-server mariadb-client gettext-base
@@ -230,3 +230,79 @@ CMD ["mysqld"]
 ```bash
 ./entrypoint.sh mysqld
 ```
+
+Regardont donc le script de plus pres :
+
+```bash
+#!/bin/bash
+
+if [ -f /entrypoint-initdb.d/init.sql.template ]; then
+  envsubst < /entrypoint-initdb.d/init.sql.template > /etc/mysql/init.sql
+  rm /entrypoint-initdb.d/init.sql.template
+fi
+
+exec "$@"
+```
+
+Whoua un script tout petit c'est génial ça va pas etre trop dur ! En réalité ce script est trompeur mais vous allez voir c'est pas tres dur a comprendre !
+
+Premierement, la condition "if" sera executé si le fichier "-f /entrypoint-initdb.d/init.sql.template" existe.
+
+Ensuite heuuuu `envsubst < /entrypoint-initdb.d/init.sql.template > /etc/mysql/init.sql` wtf ?
+Tout a l'heure je vous avait dit qu'on avait installé un package `gettext-base` et je ne vous avait pas expliqué pourquoi. Eh bien `gettext-base` est un package de Ubuntu/Debian, il contient des outils de base pour la gestion de traduction, mais surtout la commande `envsubst` = **"environment substitute"**. C’est un outil qui remplace les variables d’environnement dans des fichiers texte.
+
+Donc c'est a dire qu'on va changer toutes les variables d'environnement $USER1, $USER2 par les vraies variables : sabartho, sabartho1 du fichier `entrypoint-initdb.d/init.sql.template` et creer ce fichier remplacement qui se nommera `init.sql` dans `/etc/mysql/`
+
+Voici le fichier **entrypoint-initdb.d/init.sql.template** :
+
+```bash
+ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ADMIN_PASS}';
+CREATE DATABASE IF NOT EXISTS ${DB_NAME};
+CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
+CREATE USER IF NOT EXISTS '${DB_USER2}'@'%' IDENTIFIED BY '${DB_PASSWORD2}';
+GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+```
+
+Pour les connaisseurs ce fichier contient des commandes **SQL** :
+
+- `ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ADMIN_PASS}';` : change le mot de passe du 'root'@'localhost' par ${DB_ADMIN_PASS}
+- `CREATE DATABASE IF NOT EXISTS ${DB_NAME}` : creation de la database ${DB_NAME} si elle n'existe pas
+- `CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}`, `CREATE USER IF NOT EXISTS '${DB_USER2}'@'%' IDENTIFIED BY '${DB_PASSWORD2}` : creation de nos 2 users
+- `GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'%' WITH GRANT OPTION;` : on donne tous les privileges au ${DB_USER} sur la database ${DB_NAME}
+- `FLUSH PRIVILEGES;` : on met a jour ces modifications de privileges
+
+En réalité pour ceux qui auront compris ce sont des instructions qui vont etre effectuées lors du démmarage de notre container MariaDB, ce fichier va servir donc de fichier d'initialisation (mentionné dans le fichier de config qu'on a modifié) :
+
+```nginx
+[server]
+init_file = /etc/mysql/init.sql
+
+[mysqld]
+user                    = root
+socket                  = /run/mysqld/mysqld.sock
+port                    = 3306
+datadir                 = /var/lib/mysql
+skip-networking			= 0
+bind-address            = 0.0.0.0
+```
+
+Voici donc notre fichier d'initialisation pret `init_file = /etc/mysql/init.sql` et notre container pret a etre lancé !
+
+Ho mais quelle commande lance MariaDB je ne la vois nulle part 👀 ! Je ne vous ai pas parlé de la derniere ligne du fichier d'execution :
+
+```bash
+exec "$@"
+```
+
+Pour ceux qui ne connaissent pas la commande `exec`, grossierrement elle execute des commandes si vous ecrivez dans votre terminal : `exec "echo bonjour"` vous allez avoir `bonjour`.
+
+Et `$@` représente tous les arguments passés à un script ou à une fonction, un par un, en conservant les guillemets.
+
+Bon eh bien si on a éxécuté la commande suivante `./entrypoint.sh mysqld` on aura :
+
+```bash
+exec "mysqld"
+```
+
+Le service mysqld va donc se lancer !
