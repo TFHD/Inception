@@ -1,4 +1,4 @@
-FROM debian:bullseye
+FROM debian:bookworm
 
 RUN apt-get update -y && apt-get upgrade -y && apt-get install -y php-fpm php-mysql wget
 
@@ -10,4 +10,4 @@ COPY ./conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
 
 EXPOSE 8080
 
-CMD ["php-fpm7.4", "-F"]
+CMD ["php-fpm8.2", "-F"]
