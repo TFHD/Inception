@@ -1,4 +1,4 @@
-FROM debian:bullseye
+FROM debian:bookworm
 RUN apt update -y && apt upgrade -y && apt install -y vsftpd openssl openssh-server
 
 COPY ./tools/script.sh /
