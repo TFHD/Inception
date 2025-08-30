@@ -119,7 +119,7 @@ services:
       - inception
     ports:
       - "81:81"
-    restart: always
+    restart: on-failure
 
   server-minecraft:
     build: requirements/bonus/minecraft/
