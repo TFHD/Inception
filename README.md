@@ -80,7 +80,7 @@ Voici un bref résumé de ce que vous pouvez retrouver dans un fichier docker-co
 Bon apres appris ce qu'est Nginx, il est temps de l'installer et de le configurer ! Attaquons nous au Dockerfile du container (j'ai mis certains commentaires pour vous aider à mieux comprendre ces lignes).
 
 ```dockerfile
-FROM debian:bullseye
+FROM debian:bookworm
 
 RUN apt update -y && apt upgrade -y && apt install -y nginx openssl
 
@@ -103,9 +103,9 @@ Pour chaque container on va avoir besoin d'une image ou en d'autre terme un star
 
 Le sujet demande à ce que les images utilisées soient seulement les versions dites "old-stable" de Debian ou de Alpine (Trop dommage on aurait pu télécharger des images préfaites ça aurait été plus simple et moins loooooong 🫠​)
 
-Donc je préfère utiliser debian car je connais mieux l'OS et pour ce qui est de la version, aujourd'hui le 13/04/2025 la version old-stable est "Bullseye", donc notre image va etre debian:bullseye pour tout nos fichiers dockers.
+Donc je préfère utiliser debian car je connais mieux l'OS et pour ce qui est de la version, aujourd'hui le 13/04/2025 la version old-stable est "bookworm", donc notre image va etre debian:bookworm pour tout nos fichiers dockers.
 
-`FROM debian:bullseye`
+`FROM debian:bookworm`
 
 Oo va devoir aussi creer notre certificat SSL/TLS signé par nous même
 
@@ -158,7 +158,7 @@ Nginx transmet la requête via FastCGI → PHP-FPM (dans le container wordpress 
 Regardons ce que dit le Dockerfile :
 
 ```dockerfile
-FROM debian:bullseye
+FROM debian:bookworm
 
 RUN apt update -y && apt upgrade -y && apt install -y mariadb-server mariadb-client gettext-base
 
@@ -321,7 +321,7 @@ Pour ceux qui vivent dans une caverne, WordPress est un CMS (Content Management 
 Voici le fichier Dockerfile du container Wordpress :
 
 ```dockerfile
-FROM debian:bullseye
+FROM debian:bookworm
 
 RUN apt update -y && apt upgrade -y && apt install -y curl php-fpm php-mysqli
 
