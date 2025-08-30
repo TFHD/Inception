@@ -1,4 +1,4 @@
-FROM debian:bullseye
+FROM debian:bookworm
 
 RUN apt update -y && apt upgrade -y && apt install -y curl php-fpm php-mysqli
 
@@ -17,4 +17,4 @@ RUN chmod +x script.sh
 EXPOSE 9000
 
 ENTRYPOINT ["/var/www/html/script.sh"]
-CMD ["php-fpm7.4", "-F"]
+CMD ["php-fpm8.2", "-F"]
