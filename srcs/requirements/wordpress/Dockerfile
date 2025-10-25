@@ -6,7 +6,7 @@ RUN apt update -y && apt upgrade -y && apt install -y curl php-fpm php-mysqli
 RUN mkdir -p /run/php && chown www-data:www-data /run/php
 
 #COPY WORDPRESS CONFIG AND SET THE WORK DIR
-COPY ./conf/www.conf /etc/php/7.4/fpm/pool.d
+COPY ./conf/www.conf /etc/php/8.2/fpm/pool.d
 WORKDIR /var/www/html
 
 #COPY SETUP SCRIPT AND ADD RIGHTS
