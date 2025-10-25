@@ -329,7 +329,7 @@ RUN apt update -y && apt upgrade -y && apt install -y curl php-fpm php-mysqli
 RUN mkdir -p /run/php && chown www-data:www-data /run/php
 
 #COPY WORDPRESS CONFIG AND SET THE WORK DIR
-COPY ./conf/www.conf /etc/php/7.4/fpm/pool.d
+COPY ./conf/www.conf /etc/php/8.2/fpm/pool.d
 WORKDIR /var/www/html
 
 #COPY SETUP SCRIPT AND ADD RIGHTS
@@ -340,20 +340,20 @@ RUN chmod +x script.sh
 EXPOSE 9000
 
 ENTRYPOINT ["/var/www/html/script.sh"]
-CMD ["php-fpm7.4", "-F"]
+CMD ["php-fpm8.2", "-F"]
 ```
 
 Honnêtement, ayant donné les explications pour MariaDB, il n'y a donc pas grand-chose à expliquer sur ce Dockerfile, on installe les packages dont on a besoin, on copie le fichier de configuration modifié, on expose le port et on exécute le script.
 
 ```dockerfile
 ENTRYPOINT ["/var/www/html/script.sh"]
-CMD ["php-fpm7.4", "-F"]
+CMD ["php-fpm8.2", "-F"]
 ```
 
 donc si vous avez bien compris, c'est comme si on exécutait dans bash : 
 
 ```bash
-./var/www/html/script.sh "php-fpm7.4", "-F"
+./var/www/html/script.sh "php-fpm8.2", "-F"
 ```
 
 Voici ce qui se trouve dans le script :
@@ -392,7 +392,7 @@ Ensuite, voici le détail des commandes :
 - `./wp-cli.phar user set-role 2 editor --allow-root` : on met à cet utilisateur le droit d'éditer les commentaires (sujet de correction)
 - `./wp-cli.phar theme install astra --activate --allow-root` : j'installe le thème Astra parce que le thème de base est moche 😝
 
-et on exécute `php-fpm7.4 -F`
+et on exécute `php-fpm8.2 -F`
 
 PS : je ne sais pas si vous avez remarqué mais sur toutes les lignes il y a le flag `--allow-root`, il est obligatoire pour spécifier que vous faites des changements en tant que root.
 
