@@ -269,7 +269,7 @@ Pour les connaisseurs, ce fichier contient des commandes **SQL** :
 
 - `ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ADMIN_PASS}';` : change le mot de passe du 'root'@'localhost' par ${DB_ADMIN_PASS}.
 - `CREATE DATABASE IF NOT EXISTS ${DB_NAME}` : création de la database ${DB_NAME} si elle n'existe pas.
-- `CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}`, `CREATE USER IF NOT EXISTS '${DB_USER2}'@'%' IDENTIFIED BY '${DB_PASSWORD2}` : création de nos 2 utilisateurs.
+- `CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}` : création de notre utilisateur.
 - `GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'%' WITH GRANT OPTION;` : on donne tous les privilèges au ${DB_USER} sur la database ${DB_NAME}.
 - `FLUSH PRIVILEGES;` : on met à jour ces modifications de privilèges.
 
