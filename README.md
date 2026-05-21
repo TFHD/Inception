@@ -406,3 +406,5 @@ Bon maintenant il va falloir changer un dernier truc sur votre VM parce que vous
 Vous allez devoir mapper https://login.42.fr sur localhost. Pour ce faire, installez un éditeur de texte sur votre VM si ce n'est pas déjà fait, mettez-vous les permissions root et modifiez le fichier `/etc/hosts`, puis rajoutez une ligne `127.0.0.1 login.42.fr` dans le fichier et redémarrez votre VM !
 
 Une fois que tout ça est fait vous avez terminé la partie mandatory du projet ! Vous pouvez lancer le projet (installez Docker si vous ne le possédez pas sur votre VM) à l'aide de la commande `docker compose -f ./srcs/docker-compose.yml up -d`, -f pour spécifier votre fichier docker-compose.yml, "up" pour le lancer et "-d" pour lancer en mode "detach" comme ça il tourne en fond et vous n'êtes pas obligé de laisser votre terminal ouvert pour avoir vos conteneurs ON.
+
+Si ce tutoriel vous a été utile pour votre projet, hésitez pas à star le repo et à le partager à vos amis qui sont sur Inception ou qui vont arriver sur le projet !
